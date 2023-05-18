@@ -1,15 +1,23 @@
 import numpy as np
 import pygame
 import sys
-import math
+# import math
 
-BLUE = (0,0,255)
 BLACK = (0,0,0)
 RED = (255,0,0)
 YELLOW = (255,255,0)
+burgundy = (128, 0, 32)
+
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
+
+
+SQUARE_SIZE = 100
+width = COLUMN_COUNT * SQUARE_SIZE
+height = (ROW_COUNT+1) * SQUARE_SIZE
+RADIUS = int(SQUARE_SIZE/2 - 5)
+
 
 def create_board():
 	board = np.zeros((ROW_COUNT,COLUMN_COUNT))
@@ -32,6 +40,7 @@ def print_board(board):
 
 def print_board(board):
 	print(np.flip(board, 0))
+
 
 def winning_move(board, piece):
 	# Check horizontal locations for win
@@ -58,7 +67,32 @@ def winning_move(board, piece):
 			if board[r][c] == piece and board[r-1][c+1] == piece and board[r-2][c+2] == piece and board[r-3][c+3] == piece:
 				return True
 
+def draw_board(board):
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT):
+			pygame.draw.rect(screen, burgundy, (c*SQUARE_SIZE, r*SQUARE_SIZE+SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+			pygame.draw.circle(screen, BLACK, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int(r*SQUARE_SIZE+SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
+
 board = create_board()
 print_board(board)
 game_over = False
 turn = 0
+
+pygame.init()
+
+
+size = (width, height)
+
+screen = pygame.display.set_mode(size)
+draw_board(board)
+pygame.display.update()
+
+while not game_over:
+
+	#exiting the game by pressing x 
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			sys.exit()
+	
+		if event.type == pygame.MOUSEMOTION:
+			continue
