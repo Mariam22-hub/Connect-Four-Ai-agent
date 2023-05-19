@@ -26,6 +26,8 @@ AI_PIECE = 2
 
 WINDOW_LENGTH = 4
 
+depth = 3
+
 # Game states
 MENU = "menu"
 DIFFICULTY_SELECTION = "difficulty_selection"
@@ -56,6 +58,7 @@ DEFAULT_ALGORITHM_OPTION = 1
 current_difficulty_level = DEFAULT_DIFFICULTY_LEVEL
 current_algorithm_option = DEFAULT_ALGORITHM_OPTION
 
+
 def create_board():
     board = np.zeros((ROW_COUNT, COLUMN_COUNT))
     return board
@@ -84,10 +87,10 @@ def winning_move(board, piece):
     for c in range(COLUMN_COUNT - 3):
         for r in range(ROW_COUNT):
             if (
-                board[r][c] == piece
-                and board[r][c + 1] == piece
-                and board[r][c + 2] == piece
-                and board[r][c + 3] == piece
+                    board[r][c] == piece
+                    and board[r][c + 1] == piece
+                    and board[r][c + 2] == piece
+                    and board[r][c + 3] == piece
             ):
                 return True
 
@@ -95,10 +98,10 @@ def winning_move(board, piece):
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT - 3):
             if (
-                board[r][c] == piece
-                and board[r + 1][c] == piece
-                and board[r + 2][c] == piece
-                and board[r + 3][c] == piece
+                    board[r][c] == piece
+                    and board[r + 1][c] == piece
+                    and board[r + 2][c] == piece
+                    and board[r + 3][c] == piece
             ):
                 return True
 
@@ -106,10 +109,10 @@ def winning_move(board, piece):
     for c in range(COLUMN_COUNT - 3):
         for r in range(ROW_COUNT - 3):
             if (
-                board[r][c] == piece
-                and board[r + 1][c + 1] == piece
-                and board[r + 2][c + 2] == piece
-                and board[r + 3][c + 3] == piece
+                    board[r][c] == piece
+                    and board[r + 1][c + 1] == piece
+                    and board[r + 2][c + 2] == piece
+                    and board[r + 3][c + 3] == piece
             ):
                 return True
 
@@ -117,10 +120,10 @@ def winning_move(board, piece):
     for c in range(COLUMN_COUNT - 3):
         for r in range(3, ROW_COUNT):
             if (
-                board[r][c] == piece
-                and board[r - 1][c + 1] == piece
-                and board[r - 2][c + 2] == piece
-                and board[r - 3][c + 3] == piece
+                    board[r][c] == piece
+                    and board[r - 1][c + 1] == piece
+                    and board[r - 2][c + 2] == piece
+                    and board[r - 3][c + 3] == piece
             ):
                 return True
 
@@ -156,14 +159,14 @@ def score_position(board, piece):
     for r in range(ROW_COUNT):
         row_array = [int(i) for i in list(board[r, :])]
         for c in range(COLUMN_COUNT - 3):
-            window = row_array[c : c + WINDOW_LENGTH]
+            window = row_array[c: c + WINDOW_LENGTH]
             score += evaluate_window(window, piece)
 
     # Score vertical
     for c in range(COLUMN_COUNT):
         col_array = [int(i) for i in list(board[:, c])]
         for r in range(ROW_COUNT - 3):
-            window = col_array[r : r + WINDOW_LENGTH]
+            window = col_array[r: r + WINDOW_LENGTH]
             score += evaluate_window(window, piece)
 
     # Score positive sloped diagonal
@@ -194,74 +197,58 @@ def get_valid_locations(board):
             valid_locations.append(col)
     return valid_locations
 
+
 def minimax(board, depth, alpha, beta, maximizingPlayer):
-	valid_locations = get_valid_locations(board)
-	is_terminal = is_terminal_node(board)
-
-
-	if depth == 0 or is_terminal:
-		if is_terminal:
-			if winning_move(board, AI_PIECE):
-				return (None, 100000000000000)
-			elif winning_move(board, PLAYER_PIECE):
-				return (None, -10000000000000)
-			else: # Game is over, no more valid moves
-				return (None, 0)
-		else: # Depth is zero
-			return (None, score_position(board, AI_PIECE))
-	
-	if maximizingPlayer:
-		value = -math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			drop_piece(b_copy, row, col, AI_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
-			if new_score > value:
-				value = new_score
-				column = col	
-
-			if alpha != None and beta != None:
-				print("alpha pruning")
-				alpha = max(alpha, value)
-				if alpha >= beta:
-					break
-
-		return column, value
-
-	else: # Minimizing player
-		value = math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			drop_piece(b_copy, row, col, PLAYER_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
-			if new_score < value:
-				value = new_score
-				column = col
-
-			if beta != None and alpha != None:
-				print("alpha pruning")
-				beta = min(beta, value)
-				if alpha >= beta:
-					break
-		return column, value
-
-def pick_best_move(board, piece):
     valid_locations = get_valid_locations(board)
-    best_score = -math.inf
-    best_col = random.choice(valid_locations)
-    for col in valid_locations:
-        row = get_next_open_row(board, col)
-        temp_board = board.copy()
-        drop_piece(temp_board, row, col, piece)
-        score = score_position(temp_board, piece)
-        if score > best_score:
-            best_score = score
-            best_col = col
-    return best_col
+    is_terminal = is_terminal_node(board)
+
+    if depth == 0 or is_terminal:
+        if is_terminal:
+            if winning_move(board, AI_PIECE):
+                return (None, 100000000000000)
+            elif winning_move(board, PLAYER_PIECE):
+                return (None, -10000000000000)
+            else:  # Game is over, no more valid moves
+                return (None, 0)
+        else:  # Depth is zero
+            return (None, score_position(board, AI_PIECE))
+
+    if maximizingPlayer:
+        value = -math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
+            row = get_next_open_row(board, col)
+            b_copy = board.copy()
+            drop_piece(b_copy, row, col, AI_PIECE)
+            new_score = minimax(b_copy, depth - 1, alpha, beta, False)[1]
+            if new_score > value:
+                value = new_score
+                column = col
+
+            if alpha is not None and beta is not None:
+                alpha = max(alpha, value)
+                if alpha >= beta:
+                    break
+
+        return column, value
+
+    else:  # Minimizing player
+        value = math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
+            row = get_next_open_row(board, col)
+            b_copy = board.copy()
+            drop_piece(b_copy, row, col, PLAYER_PIECE)
+            new_score = minimax(b_copy, depth - 1, alpha, beta, True)[1]
+            if new_score < value:
+                value = new_score
+                column = col
+
+            if beta != None and alpha != None:
+                beta = min(beta, value)
+                if alpha >= beta:
+                    break
+        return column, value
 
 
 def draw_board(board):
@@ -410,17 +397,28 @@ def initialize_game():
 
 def handle_menu_events():
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
+            print("mmmmm")
             pygame.quit()
             sys.exit()
-        elif event.type == pygame.KEYDOWN:
+
+        if event.type == pygame.KEYDOWN:
+            print("difficulty selection")
             if event.key == pygame.K_1:
+                depth = 3
+                print(depth)
                 return 1
             elif event.key == pygame.K_2:
+                depth = 4
+                print(depth)
                 return 2
             elif event.key == pygame.K_3:
+                depth = 5
+                print(depth)
                 return 3
-    return None
+            else:
+                return 1
 
 
 def handle_difficulty_selection_events():
@@ -428,64 +426,22 @@ def handle_difficulty_selection_events():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        
+
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_1:
                 return 1
             elif event.key == pygame.K_2:
                 return 2
-    return None
-
-
-def handle_game_events():
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if game_state == GAME:
-                
-                # Player's turn
-                col = event.pos[0] // SQUARESIZE
-                
-                if is_valid_location(board, col):
-                    row = get_next_open_row(board, col)
-                    drop_piece(board, row, col, PLAYER_PIECE)
-                    
-                    if winning_move(board, PLAYER_PIECE):
-                        game_state = GAME_OVER
-                        draw_game_over(PLAYER)
-                        break
-
-                    # AI's turn
-                    col = pick_best_move(board, AI_PIECE)
-                    if is_valid_location(board, col):
-                        pygame.time.wait(500)
-                        row = get_next_open_row(board, col)
-                        drop_piece(board, row, col, AI_PIECE)
-                        
-                        if winning_move(board, AI_PIECE):
-                            game_state = GAME_OVER
-                            draw_game_over(AI)
-                            break
-
-                    if len(get_valid_locations(board)) == 0:
-                        game_state = GAME_OVER
-                        draw_game_over(None)
-
-                    draw_board(board)
-
-    return None
-
 
 pygame.init()
-
+game_over = False
 SQUARESIZE = 100
 
 width = COLUMN_COUNT * SQUARESIZE
 height = (ROW_COUNT + 1) * SQUARESIZE
 size = (width, height)
+
+myfont = pygame.font.SysFont("arielblack", 75)
 
 RADIUS = SQUARESIZE // 2 - 5
 
@@ -494,26 +450,86 @@ draw_menu()
 menu_selected_level = None
 difficulty_selection_selected_algorithm = None
 game_state = MENU
+turn = random.randint(PLAYER, AI)
 
 while True:
     if game_state == MENU:
+
         menu_selected_level = handle_menu_events()
-        
+        # menu_selected_level = 1
+
         if menu_selected_level is not None:
             game_state = DIFFICULTY_SELECTION
+
             current_difficulty_level = menu_selected_level
+
             draw_difficulty_selection()
 
     elif game_state == DIFFICULTY_SELECTION:
-        
+
         difficulty_selection_selected_algorithm = handle_difficulty_selection_events()
-        
+
         if difficulty_selection_selected_algorithm is not None:
             game_state = GAME
+
             current_algorithm_option = difficulty_selection_selected_algorithm
+            print(current_algorithm_option)
+
             initialize_game()
 
     elif game_state == GAME:
-        handle_game_events()
+        print("turn=", turn)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-    pygame.display.update()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pass
+
+            # Player's turn
+        if turn == PLAYER and game_over == False:
+            col = random.randint(0, COLUMN_COUNT - 1)
+            if is_valid_location(board, col):
+                pygame.time.wait(500)
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, PLAYER_PIECE)
+
+                if winning_move(board, PLAYER_PIECE):
+                    label = myfont.render("Player 1 wins!!", 1, RED)
+                    screen.blit(label, (40, 10))
+                    game_over = True
+                turn += 1
+                turn = turn % 2
+
+                print_board(board)
+                draw_board(board)
+
+
+        elif turn == AI and game_over == False:
+
+            if current_algorithm_option == 1:
+                col, minimax_score = minimax(board, depth, None, None, True)
+
+            elif current_algorithm_option == 2:
+                col, minimax_score = minimax(board, 5, -math.inf, math.inf, True)
+
+            if is_valid_location(board, col):
+                pygame.time.wait(500)
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, AI_PIECE)
+
+                if winning_move(board, AI_PIECE):
+                    label = myfont.render("Ai agent wins!!", 1, violet)
+                    screen.blit(label, (40, 10))
+                    game_over = True
+                turn += 1
+                turn = turn % 2
+
+                print_board(board)
+                draw_board(board)
+
+        if game_over:
+            print("over")
+            pygame.time.wait(3000)
+            sys.exit()
