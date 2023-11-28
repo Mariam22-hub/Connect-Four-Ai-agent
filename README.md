@@ -15,7 +15,7 @@ Connect 4 programmed in python using pygame.
 - Visual indications for player actions and game status updates.
 
 ### AI Opponent
-- AI opponent implementing Minimax algorithm with enhancements like alpha-beta pruning for efficient decision making.
+- AI opponent implementing ***Minimax*** algorithm with enhancements like ***alpha-beta pruning*** for efficient decision making.
 - Difficulty levels for the AI, providing varying levels of challenge.
 
 ### Interactive Game States
